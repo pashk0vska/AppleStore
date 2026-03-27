@@ -2,4 +2,28 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="background">#FF000000</color>
+    <color name="surface">#FF141414</color>
+    <color name="surface2">#FF1E1E1E</color>
+
+    <color name="accent">#FFFFEE00</color>
+    <color name="accent_dim">#26FFEE00</color>
+
+    <color name="text_primary">#FFFFFFFF</color>
+    <color name="text_secondary">#8CFFFFFF</color>
+    <color name="text_disabled">#47FFFFFF</color>
+
+    <color name="status_new">#FF0A84FF</color>
+    <color name="status_progress">#FFFF9F0A</color>
+    <color name="status_done">#FF32D74B</color>
+    <color name="status_delivered">#FFBF5AF2</color>
+    <color name="status_cancelled">#FFFF453A</color>
+
+    <color name="danger">#FFFF453A</color>
+    <color name="success">#FF32D74B</color>
+
+    <color name="nav_background">#FF0D0D0D</color>
+    <color name="card_border">#FF2A2A2A</color>
+    <color name="divider">#FF161616</color>
 </resources>
