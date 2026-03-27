@@ -38,7 +38,9 @@ class ProductsFragment : Fragment() {
         etSearch = view.findViewById(R.id.etSearch)
 
         adapter = ProductsAdapter(StoreRepository.products) { product ->
-            Toast.makeText(context, product.name, Toast.LENGTH_SHORT).show()
+            val intent = android.content.Intent(context, ProductDetailActivity::class.java)
+            intent.putExtra("PRODUCT_ID", product.id)
+            startActivity(intent)
         }
         rvProducts.layoutManager = GridLayoutManager(context, 2)
         rvProducts.adapter = adapter
