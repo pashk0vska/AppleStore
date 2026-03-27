@@ -1,18 +1,106 @@
 package com.example.applestore.ui.products
 
 import android.os.Bundle
-import android.view.*
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.applestore.databinding.FragmentProductsBinding
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.applestore.R
+import com.example.applestore.data.repository.StoreRepository
 
 class ProductsFragment : Fragment() {
-    private var _binding: FragmentProductsBinding? = null
-    private val binding get() = _binding!!
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentProductsBinding.inflate(inflater, container, false)
-        return binding.root
+    private lateinit var adapter: ProductsAdapter
+    private lateinit var rvProducts: RecyclerView
+    private lateinit var etSearch: EditText
+    private var selectedCategoryName: String? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return inflater.inflate(R.layout.fragment_products, container, false)
     }
 
-    override fun onDestroyView() { super.onDestroyView(); _binding = null }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        rvProducts = view.findViewById(R.id.rvProducts)
+        etSearch = view.findViewById(R.id.etSearch)
+
+        adapter = ProductsAdapter(StoreRepository.products) { product ->
+            Toast.makeText(context, product.name, Toast.LENGTH_SHORT).show()
+        }
+        rvProducts.layoutManager = GridLayoutManager(context, 2)
+        rvProducts.adapter = adapter
+
+        setupChips(view)
+
+        etSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) { filterProducts(s.toString()) }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+    }
+
+    private fun setupChips(view: View) {
+        val chipGroup = view.findViewById<LinearLayout>(R.id.chipGroup)
+        chipGroup.removeAllViews()
+
+        val categories = listOf(
+            null to "Всі",
+            "iPhone" to "iPhone",
+            "iPad" to "iPad",
+            "MacBook" to "MacBook",
+            "Apple Watch" to "Watch",
+            "Аксесуари" to "Аксесуари"
+        )
+
+        categories.forEach { (categoryName, label) ->
+            val isActive = categoryName == selectedCategoryName
+            val chip = TextView(context).apply {
+                text = label
+                textSize = 12f
+                setPadding(28, 14, 28, 14)
+                setTextColor(
+                    if (isActive) resources.getColor(R.color.accent, null)
+                    else resources.getColor(R.color.text_secondary, null)
+                )
+                background = resources.getDrawable(
+                    if (isActive) R.drawable.bg_chip_active
+                    else R.drawable.bg_chip, null
+                )
+                val params = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                params.setMargins(0, 0, 8, 0)
+                layoutParams = params
+                setOnClickListener {
+                    selectedCategoryName = categoryName
+                    filterProducts(etSearch.text.toString())
+                    setupChips(requireView())
+                }
+            }
+            chipGroup.addView(chip)
+        }
+    }
+
+    private fun filterProducts(query: String) {
+        var list = if (query.isEmpty()) StoreRepository.products.toList()
+        else StoreRepository.searchProducts(query)
+        if (selectedCategoryName != null) {
+            list = list.filter { it.category.displayName == selectedCategoryName }
+        }
+        adapter.updateList(list)
+    }
 }
