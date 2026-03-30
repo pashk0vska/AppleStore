@@ -27,6 +27,9 @@
         <activity
             android:name=".ui.products.ProductDetailActivity"
             android:exported="false"/>
+        <activity
+            android:name=".ui.auth.RegisterActivity"
+            android:exported="false"/>
 
     </application>
 

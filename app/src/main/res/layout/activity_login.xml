@@ -29,11 +29,12 @@
         android:id="@+id/etLogin"
         android:layout_width="match_parent"
         android:layout_height="52dp"
+        android:background="@drawable/bg_input"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:textColor="@color/text_primary"
         android:textColorHint="@color/text_disabled"
-        android:hint="Логін"
+        android:hint="Логін / Телефон / Email"
         android:inputType="text"
         android:textSize="15sp"
         android:layout_marginBottom="16dp"/>
@@ -42,6 +43,7 @@
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="52dp"
+        android:background="@drawable/bg_input"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:textColor="@color/text_primary"
@@ -55,17 +57,35 @@
         android:id="@+id/btnLogin"
         android:layout_width="match_parent"
         android:layout_height="54dp"
+        android:background="@drawable/bg_button_primary"
         android:text="УВІЙТИ"
         android:textColor="@color/black"
         android:textSize="14sp"
-        android:textStyle="bold"/>
-    <TextView
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Адмін: admin / admin&#10;Клієнт: телефон або email / 1234"
-        android:textColor="@color/text_secondary"
-        android:textSize="12sp"
         android:gravity="center"
-        android:layout_marginTop="16dp"/>
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Немає акаунту? "
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/tvRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Зареєструватись"
+            android:textColor="@color/accent"
+            android:textSize="14sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
 
 </LinearLayout>

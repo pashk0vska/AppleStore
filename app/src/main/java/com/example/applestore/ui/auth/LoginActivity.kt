@@ -21,6 +21,9 @@ class LoginActivity : AppCompatActivity() {
         val etLogin = findViewById<EditText>(R.id.etLogin)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
+        findViewById<TextView>(R.id.tvRegister).setOnClickListener {
+            startActivity(Intent(this, RegisterActivity::class.java))
+        }
 
         btnLogin.setOnClickListener {
             val login = etLogin.text.toString().trim()
@@ -45,16 +48,17 @@ class LoginActivity : AppCompatActivity() {
                         it.phone.replace(" ", "") == login.replace(" ", "") ||
                                 it.email == login
                     }
-                    if (client != null && password == "1234") {
-                        SessionManager.loginAsClient(client.id, client.name)
-                        startActivity(Intent(this, MainActivity::class.java))
-                        finish()
+                    if (client != null) {
+                        val savedPassword = StoreRepository.clientPasswords[client.id]
+                        if (savedPassword == password) {
+                            SessionManager.loginAsClient(client.id, client.name)
+                            startActivity(Intent(this, MainActivity::class.java))
+                            finish()
+                        } else {
+                            Toast.makeText(this, "Невірний пароль", Toast.LENGTH_SHORT).show()
+                        }
                     } else {
-                        Toast.makeText(
-                            this,
-                            "Невірний логін або пароль",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(this, "Клієнта не знайдено", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

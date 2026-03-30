@@ -54,6 +54,15 @@ object StoreRepository {
         Client(5, "Шевченко Іван", "+380 63 111 2233", "ivan.sh@ukr.net"),
         Client(6, "Бондаренко Марія", "+380 66 444 5566", "maria@gmail.com")
     )
+    // Паролі клієнтів (clientId -> password)
+    val clientPasswords = hashMapOf(
+        1 to "1234",
+        2 to "1234",
+        3 to "1234",
+        4 to "1234",
+        5 to "1234",
+        6 to "1234"
+    )
 
     val orders = arrayListOf(
         Order(124, 1, 1, 1, 54999.0, OrderStatus.CONFIRMED, "25.03.2026"),
