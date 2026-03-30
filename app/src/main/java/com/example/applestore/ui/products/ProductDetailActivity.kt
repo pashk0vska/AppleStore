@@ -29,7 +29,7 @@ class ProductDetailActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvName).text = product.name
         findViewById<TextView>(R.id.tvPrice).text = "${product.price.toInt()} ₴"
         findViewById<TextView>(R.id.tvDescription).text = product.description
-        findViewById<TextView>(R.id.tvCategory).text = product.category.displayName
+        findViewById<TextView>(R.id.tvCategory).text = product.category
         findViewById<TextView>(R.id.tvStockCount).text = "${product.stock} шт."
 
         // Стара ціна

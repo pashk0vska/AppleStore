@@ -9,11 +9,11 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.applestore.R
+import com.example.applestore.data.repository.SessionManager
 import com.example.applestore.data.repository.StoreRepository
 
 class ProductsFragment : Fragment() {
@@ -21,7 +21,7 @@ class ProductsFragment : Fragment() {
     private lateinit var adapter: ProductsAdapter
     private lateinit var rvProducts: RecyclerView
     private lateinit var etSearch: EditText
-    private var selectedCategoryName: String? = null
+    private var selectedCategory: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,13 +35,14 @@ class ProductsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         rvProducts = view.findViewById(R.id.rvProducts)
-        etSearch = view.findViewById(R.id.etSearch)
+        etSearch   = view.findViewById(R.id.etSearch)
 
-        adapter = ProductsAdapter(StoreRepository.products) { product ->
+        adapter = ProductsAdapter(StoreRepository.products.toList()) { product ->
             val intent = android.content.Intent(context, ProductDetailActivity::class.java)
             intent.putExtra("PRODUCT_ID", product.id)
             startActivity(intent)
         }
+
         rvProducts.layoutManager = GridLayoutManager(context, 2)
         rvProducts.adapter = adapter
 
@@ -59,16 +60,16 @@ class ProductsFragment : Fragment() {
         chipGroup.removeAllViews()
 
         val categories = listOf(
-            null to "Всі",
-            "iPhone" to "iPhone",
-            "iPad" to "iPad",
-            "MacBook" to "MacBook",
+            null         to "Всі",
+            "iPhone"     to "iPhone",
+            "iPad"       to "iPad",
+            "MacBook"    to "MacBook",
             "Apple Watch" to "Watch",
-            "Аксесуари" to "Аксесуари"
+            "Аксесуари"  to "Аксесуари"
         )
 
         categories.forEach { (categoryName, label) ->
-            val isActive = categoryName == selectedCategoryName
+            val isActive = categoryName == selectedCategory
             val chip = TextView(context).apply {
                 text = label
                 textSize = 12f
@@ -88,7 +89,7 @@ class ProductsFragment : Fragment() {
                 params.setMargins(0, 0, 8, 0)
                 layoutParams = params
                 setOnClickListener {
-                    selectedCategoryName = categoryName
+                    selectedCategory = categoryName
                     filterProducts(etSearch.text.toString())
                     setupChips(requireView())
                 }
@@ -100,8 +101,8 @@ class ProductsFragment : Fragment() {
     private fun filterProducts(query: String) {
         var list = if (query.isEmpty()) StoreRepository.products.toList()
         else StoreRepository.searchProducts(query)
-        if (selectedCategoryName != null) {
-            list = list.filter { it.category.displayName == selectedCategoryName }
+        if (selectedCategory != null) {
+            list = list.filter { it.category == selectedCategory }
         }
         adapter.updateList(list)
     }

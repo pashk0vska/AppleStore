@@ -16,10 +16,10 @@ class ProductsAdapter(
 ) : RecyclerView.Adapter<ProductsAdapter.ProductViewHolder>() {
 
     inner class ProductViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvName: TextView = view.findViewById(R.id.tvName)
-        val tvPrice: TextView = view.findViewById(R.id.tvPrice)
+        val tvName: TextView     = view.findViewById(R.id.tvName)
+        val tvPrice: TextView    = view.findViewById(R.id.tvPrice)
         val tvOldPrice: TextView = view.findViewById(R.id.tvOldPrice)
-        val tvStars: TextView = view.findViewById(R.id.tvStars)
+        val tvStars: TextView    = view.findViewById(R.id.tvStars)
         val ivProduct: ImageView = view.findViewById(R.id.ivProduct)
     }
 
@@ -32,8 +32,9 @@ class ProductsAdapter(
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val product = products[position]
 
-        holder.tvName.text = product.name
+        holder.tvName.text  = product.name
         holder.tvPrice.text = "${product.price.toInt()} ₴"
+        holder.tvStars.text = "★★★★★"
 
         if (product.oldPrice != null) {
             holder.tvOldPrice.visibility = View.VISIBLE

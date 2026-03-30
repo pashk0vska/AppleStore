@@ -46,12 +46,12 @@ class NewOrderActivity : AppCompatActivity() {
             .load(product.imageUrl)
             .placeholder(R.color.surface2)
             .centerCrop()
-            .into(findViewById(R.id.ivProduct))
+            .into(findViewById<ImageView>(R.id.ivProduct))
 
         // Кнопка назад
         findViewById<TextView>(R.id.btnBack).setOnClickListener { finish() }
 
-        // Кнопки кількості
+        // Кнопка мінус
         findViewById<Button>(R.id.btnMinus).setOnClickListener {
             if (quantity > 1) {
                 quantity--
@@ -59,33 +59,47 @@ class NewOrderActivity : AppCompatActivity() {
             }
         }
 
+        // Кнопка плюс
         findViewById<Button>(R.id.btnPlus).setOnClickListener {
             if (quantity < product.stock) {
                 quantity++
                 updateQuantity()
             } else {
-                Toast.makeText(this, "Максимальна кількість: ${product.stock}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Максимальна кількість: ${product.stock}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
         // Підтвердження замовлення
         findViewById<Button>(R.id.btnConfirmOrder).setOnClickListener {
             val newId = (StoreRepository.orders.maxOfOrNull { it.id } ?: 0) + 1
-            val date = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date())
+            val date  = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date())
 
             val order = Order(
-                id = newId,
-                clientId = SessionManager.currentClientId,
-                productId = productId,
-                quantity = quantity,
-                totalPrice = pricePerItem * quantity,
-                status = OrderStatus.NEW,
+                id          = newId,
+                clientId    = SessionManager.currentClientId,
+                productId   = productId,
+                quantity    = quantity,
+                totalPrice  = pricePerItem * quantity,
+                status      = OrderStatus.NEW,
                 createdDate = date
             )
 
             StoreRepository.addOrder(order)
 
-            Toast.makeText(this, "Замовлення #$newId оформлено!", Toast.LENGTH_LONG).show()
+            // Зберігаємо в SharedPreferences
+            val prefs = getSharedPreferences("apple_store_data", MODE_PRIVATE)
+            StoreRepository.saveToPrefs(prefs)
+
+            Toast.makeText(
+                this,
+                "Замовлення #$newId оформлено!",
+                Toast.LENGTH_LONG
+            ).show()
+
             finish()
         }
     }

@@ -59,36 +59,39 @@ class RegisterActivity : AppCompatActivity() {
                     etPasswordConfirm.error = "Паролі не співпадають"
                     return@setOnClickListener
                 }
-                // Перевірка чи телефон вже зареєстрований
                 StoreRepository.clients.any {
                     it.phone.replace(" ", "") == phone.replace(" ", "")
                 } -> {
                     etPhone.error = "Цей телефон вже зареєстрований"
                     return@setOnClickListener
                 }
-                // Перевірка чи email вже зареєстрований
                 StoreRepository.clients.any { it.email == email } -> {
                     etEmail.error = "Цей email вже зареєстрований"
                     return@setOnClickListener
                 }
             }
 
-            // Створення нового клієнта
+            // Генеруємо новий id
             val newId = (StoreRepository.clients.maxOfOrNull { it.id } ?: 0) + 1
+
+            // Створення нового клієнта
             val newClient = Client(
                 id = newId,
                 name = name,
                 phone = phone,
-                email = email
+                email = email,
+                password = password
             )
 
-            // Зберігаємо пароль
+            // Додаємо клієнта і зберігаємо пароль
+            StoreRepository.addClient(newClient)
             StoreRepository.clientPasswords[newId] = password
 
-            // Додаємо клієнта
-            StoreRepository.addClient(newClient)
+            // Зберігаємо в SharedPreferences
+            val prefs = getSharedPreferences("apple_store_data", MODE_PRIVATE)
+            StoreRepository.saveToPrefs(prefs)
 
-            // Авторизуємось
+            // Авторизуємось як новий клієнт
             SessionManager.loginAsClient(newId, name)
 
             Toast.makeText(this, "Вітаємо, $name!", Toast.LENGTH_SHORT).show()

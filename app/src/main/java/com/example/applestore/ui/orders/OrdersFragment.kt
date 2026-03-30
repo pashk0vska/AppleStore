@@ -34,7 +34,6 @@ class OrdersFragment : Fragment() {
 
         val rvOrders = view.findViewById<RecyclerView>(R.id.rvOrders)
 
-        // Завжди беремо актуальні дані
         adapter = OrdersAdapter(StoreRepository.orders.toList()) { order ->
             showStatusDialog(order)
         }
@@ -44,22 +43,22 @@ class OrdersFragment : Fragment() {
 
         setupChips(view)
 
-
         view.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(
             R.id.fabNewOrder
         ).setOnClickListener {
             Toast.makeText(context, "Нове замовлення", Toast.LENGTH_SHORT).show()
         }
     }
+
     override fun onResume() {
         super.onResume()
         adapter.updateList(StoreRepository.orders.toList())
         setupChips(requireView())
     }
 
-    // Діалог для зміни статусу замовлення (тільки для адміна)
+    // Діалог зміни статусу (тільки для адміна)
     private fun showStatusDialog(order: Order) {
-        val statuses = OrderStatus.values()
+        val statuses    = OrderStatus.values()
         val statusNames = statuses.map { it.displayName }.toTypedArray()
         val currentIndex = statuses.indexOf(order.status)
 
@@ -67,6 +66,14 @@ class OrdersFragment : Fragment() {
             .setTitle("Замовлення #${order.id}")
             .setSingleChoiceItems(statusNames, currentIndex) { dialog, which ->
                 StoreRepository.updateOrderStatus(order.id, statuses[which])
+
+                // Зберігаємо зміну статусу в SharedPreferences
+                val prefs = requireContext().getSharedPreferences(
+                    "apple_store_data",
+                    android.content.Context.MODE_PRIVATE
+                )
+                StoreRepository.saveToPrefs(prefs)
+
                 adapter.updateList(StoreRepository.orders.toList())
                 dialog.dismiss()
                 Toast.makeText(context, "Статус оновлено!", Toast.LENGTH_SHORT).show()
@@ -117,5 +124,4 @@ class OrdersFragment : Fragment() {
         else StoreRepository.orders.filter { it.status == selectedStatus }
         adapter.updateList(list)
     }
-
 }

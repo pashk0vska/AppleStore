@@ -18,15 +18,21 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val etLogin = findViewById<EditText>(R.id.etLogin)
+        // Завантажуємо збережених клієнтів
+        val prefs = getSharedPreferences("apple_store_data", MODE_PRIVATE)
+        StoreRepository.loadFromPrefs(prefs)
+
+        val etLogin    = findViewById<EditText>(R.id.etLogin)
         val etPassword = findViewById<EditText>(R.id.etPassword)
-        val btnLogin = findViewById<Button>(R.id.btnLogin)
+        val btnLogin   = findViewById<Button>(R.id.btnLogin)
+
+        // Кнопка реєстрації
         findViewById<TextView>(R.id.tvRegister).setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 
         btnLogin.setOnClickListener {
-            val login = etLogin.text.toString().trim()
+            val login    = etLogin.text.toString().trim()
             val password = etPassword.text.toString().trim()
 
             when {
@@ -42,15 +48,12 @@ class LoginActivity : AppCompatActivity() {
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()
                 }
-                // Клієнт — шукаємо по телефону або email
+                // Клієнт
                 else -> {
-                    val client = StoreRepository.clients.find {
-                        it.phone.replace(" ", "") == login.replace(" ", "") ||
-                                it.email == login
-                    }
+                    val client = StoreRepository.getClientByPhoneOrEmail(login)
                     if (client != null) {
                         val savedPassword = StoreRepository.clientPasswords[client.id]
-                        if (savedPassword == password) {
+                        if (savedPassword == password || client.password == password) {
                             SessionManager.loginAsClient(client.id, client.name)
                             startActivity(Intent(this, MainActivity::class.java))
                             finish()
