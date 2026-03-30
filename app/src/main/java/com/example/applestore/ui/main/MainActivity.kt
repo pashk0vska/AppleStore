@@ -1,13 +1,18 @@
 package com.example.applestore.ui.main
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.applestore.R
+import com.example.applestore.data.model.UserRole
+import com.example.applestore.data.repository.SessionManager
 import com.example.applestore.ui.clients.ClientsFragment
 import com.example.applestore.ui.orders.OrdersFragment
+import com.example.applestore.ui.orders.MyOrdersFragment
 import com.example.applestore.ui.products.ProductsFragment
 import com.example.applestore.ui.settings.SettingsFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,16 +20,28 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
+
+        // Налаштовуємо меню залежно від ролі
+        if (SessionManager.isAdmin()) {
+            bottomNav.menu.clear()
+            bottomNav.inflateMenu(R.menu.bottom_nav_menu_admin)
+        } else {
+            bottomNav.menu.clear()
+            bottomNav.inflateMenu(R.menu.bottom_nav_menu_client)
+        }
+
+        // Стартовий фрагмент
         if (savedInstanceState == null) {
             loadFragment(ProductsFragment())
         }
 
-        val bottomNav = findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNav)
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_products -> loadFragment(ProductsFragment())
-                R.id.nav_orders   -> loadFragment(OrdersFragment())
-                R.id.nav_clients  -> loadFragment(ClientsFragment())
+                R.id.nav_orders -> loadFragment(OrdersFragment())
+                R.id.nav_my_orders -> loadFragment(MyOrdersFragment())
+                R.id.nav_clients -> loadFragment(ClientsFragment())
                 R.id.nav_settings -> loadFragment(SettingsFragment())
             }
             true

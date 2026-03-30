@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_products"
+        android:icon="@drawable/ic_products"
+        android:title="Товари"/>
+    <item
+        android:id="@+id/nav_my_orders"
+        android:icon="@drawable/ic_orders"
+        android:title="Мої замовлення"/>
+</menu>

@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import com.example.applestore.R
 import com.example.applestore.data.repository.StoreRepository
 import com.example.applestore.ui.auth.LoginActivity
-
+import com.example.applestore.data.repository.SessionManager
 class SettingsFragment : Fragment() {
 
     override fun onCreateView(
@@ -63,6 +63,7 @@ class SettingsFragment : Fragment() {
             AlertDialog.Builder(requireContext())
                 .setTitle("Вийти з акаунту?")
                 .setPositiveButton("Вийти") { _, _ ->
+                    SessionManager.logout()
                     val intent = Intent(requireContext(), LoginActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
