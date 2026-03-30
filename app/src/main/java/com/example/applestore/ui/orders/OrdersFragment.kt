@@ -7,10 +7,12 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.applestore.R
+import com.example.applestore.data.model.Order
 import com.example.applestore.data.model.OrderStatus
 import com.example.applestore.data.repository.StoreRepository
 
@@ -32,8 +34,9 @@ class OrdersFragment : Fragment() {
 
         val rvOrders = view.findViewById<RecyclerView>(R.id.rvOrders)
 
-        adapter = OrdersAdapter(StoreRepository.orders) { order ->
-            Toast.makeText(context, "Замовлення #${order.id}", Toast.LENGTH_SHORT).show()
+        // Завжди беремо актуальні дані
+        adapter = OrdersAdapter(StoreRepository.orders.toList()) { order ->
+            showStatusDialog(order)
         }
 
         rvOrders.layoutManager = LinearLayoutManager(context)
@@ -41,11 +44,35 @@ class OrdersFragment : Fragment() {
 
         setupChips(view)
 
+
         view.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(
             R.id.fabNewOrder
         ).setOnClickListener {
-            Toast.makeText(context, "Нове замовлення — буде в наступному кроці", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Нове замовлення", Toast.LENGTH_SHORT).show()
         }
+    }
+    override fun onResume() {
+        super.onResume()
+        adapter.updateList(StoreRepository.orders.toList())
+        setupChips(requireView())
+    }
+
+    // Діалог для зміни статусу замовлення (тільки для адміна)
+    private fun showStatusDialog(order: Order) {
+        val statuses = OrderStatus.values()
+        val statusNames = statuses.map { it.displayName }.toTypedArray()
+        val currentIndex = statuses.indexOf(order.status)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Замовлення #${order.id}")
+            .setSingleChoiceItems(statusNames, currentIndex) { dialog, which ->
+                StoreRepository.updateOrderStatus(order.id, statuses[which])
+                adapter.updateList(StoreRepository.orders.toList())
+                dialog.dismiss()
+                Toast.makeText(context, "Статус оновлено!", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Скасувати", null)
+            .show()
     }
 
     private fun setupChips(view: View) {
@@ -90,4 +117,5 @@ class OrdersFragment : Fragment() {
         else StoreRepository.orders.filter { it.status == selectedStatus }
         adapter.updateList(list)
     }
+
 }

@@ -35,14 +35,15 @@ class ClientsFragment : Fragment() {
         val rvClients = view.findViewById<RecyclerView>(R.id.rvClients)
         etSearch = view.findViewById(R.id.etSearchClient)
 
-        adapter = ClientsAdapter(StoreRepository.clients) { client ->
+        // Завжди беремо актуальні дані
+        adapter = ClientsAdapter(StoreRepository.clients.toList()) { client ->
             Toast.makeText(context, client.name, Toast.LENGTH_SHORT).show()
         }
 
         rvClients.layoutManager = LinearLayoutManager(context)
         rvClients.adapter = adapter
 
-        // Відкриваємо клавіатуру при натисканні
+
         etSearch.setOnClickListener {
             etSearch.requestFocus()
             val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -60,4 +61,10 @@ class ClientsFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
     }
+    override fun onResume() {
+        super.onResume()
+        adapter.updateList(StoreRepository.clients.toList())
+    }
+
+
 }

@@ -44,4 +44,9 @@ class MyOrdersFragment : Fragment() {
         view.findViewById<TextView>(R.id.tvClientGreeting).text =
             "Привіт, ${SessionManager.currentClientName}!"
     }
+    override fun onResume() {
+        super.onResume()
+        val myOrders = StoreRepository.getOrdersByClientId(SessionManager.currentClientId)
+        adapter.updateList(myOrders)
+    }
 }

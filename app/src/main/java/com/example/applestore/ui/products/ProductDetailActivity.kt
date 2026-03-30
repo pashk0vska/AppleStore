@@ -9,7 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.applestore.R
 import com.example.applestore.data.repository.StoreRepository
-
+import com.example.applestore.data.repository.SessionManager
+import com.example.applestore.ui.orders.NewOrderActivity
 class ProductDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +63,13 @@ class ProductDetailActivity : AppCompatActivity() {
 
         // Кнопка замовити
         findViewById<Button>(R.id.btnOrder).setOnClickListener {
-            Toast.makeText(this, "Переходимо до замовлення...", Toast.LENGTH_SHORT).show()
+            if (SessionManager.isClient()) {
+                val intent = android.content.Intent(this, NewOrderActivity::class.java)
+                intent.putExtra("PRODUCT_ID", productId)
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "Увійдіть як клієнт щоб замовити", Toast.LENGTH_SHORT).show()
+            }
         }
 
         // Кнопка редагувати
