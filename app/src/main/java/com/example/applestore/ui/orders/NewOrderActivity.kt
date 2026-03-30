@@ -88,9 +88,19 @@ class NewOrderActivity : AppCompatActivity() {
                 createdDate = date
             )
 
+            // Додаємо замовлення
             StoreRepository.addOrder(order)
 
-            // Зберігаємо в SharedPreferences
+            // Зменшуємо залишок товару
+            val currentProduct = StoreRepository.getProductById(productId)
+            if (currentProduct != null) {
+                StoreRepository.updateProductStock(
+                    productId,
+                    currentProduct.stock - quantity
+                )
+            }
+
+            // Зберігаємо всі зміни в SharedPreferences
             val prefs = getSharedPreferences("apple_store_data", MODE_PRIVATE)
             StoreRepository.saveToPrefs(prefs)
 

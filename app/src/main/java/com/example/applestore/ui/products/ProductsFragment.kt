@@ -1,5 +1,6 @@
 package com.example.applestore.ui.products
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.applestore.R
 import com.example.applestore.data.repository.SessionManager
 import com.example.applestore.data.repository.StoreRepository
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ProductsFragment : Fragment() {
 
@@ -38,7 +40,7 @@ class ProductsFragment : Fragment() {
         etSearch   = view.findViewById(R.id.etSearch)
 
         adapter = ProductsAdapter(StoreRepository.products.toList()) { product ->
-            val intent = android.content.Intent(context, ProductDetailActivity::class.java)
+            val intent = Intent(context, ProductDetailActivity::class.java)
             intent.putExtra("PRODUCT_ID", product.id)
             startActivity(intent)
         }
@@ -48,6 +50,17 @@ class ProductsFragment : Fragment() {
 
         setupChips(view)
 
+        // FAB — тільки для адміна
+        val fab = view.findViewById<FloatingActionButton>(R.id.fabAddProduct)
+        if (SessionManager.isAdmin()) {
+            fab.visibility = View.VISIBLE
+            fab.setOnClickListener {
+                startActivity(Intent(context, AddProductActivity::class.java))
+            }
+        } else {
+            fab.visibility = View.GONE
+        }
+
         etSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) { filterProducts(s.toString()) }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -55,17 +68,23 @@ class ProductsFragment : Fragment() {
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Оновлюємо список при поверненні (після додавання товару)
+        adapter.updateList(StoreRepository.products.toList())
+    }
+
     private fun setupChips(view: View) {
         val chipGroup = view.findViewById<LinearLayout>(R.id.chipGroup)
         chipGroup.removeAllViews()
 
         val categories = listOf(
-            null         to "Всі",
-            "iPhone"     to "iPhone",
-            "iPad"       to "iPad",
-            "MacBook"    to "MacBook",
+            null          to "Всі",
+            "iPhone"      to "iPhone",
+            "iPad"        to "iPad",
+            "MacBook"     to "MacBook",
             "Apple Watch" to "Watch",
-            "Аксесуари"  to "Аксесуари"
+            "Аксесуари"   to "Аксесуари"
         )
 
         categories.forEach { (categoryName, label) ->

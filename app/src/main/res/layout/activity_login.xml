@@ -7,6 +7,12 @@
     android:background="@color/background"
     android:padding="24dp"
     android:gravity="center">
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_logo"
+        android:scaleType="fitCenter"
+        android:layout_marginBottom="24dp"/>
 
     <TextView
         android:layout_width="wrap_content"

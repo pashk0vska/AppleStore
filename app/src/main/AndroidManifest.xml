@@ -33,6 +33,9 @@
         <activity
             android:name=".ui.orders.NewOrderActivity"
             android:exported="false"/>
+        <activity
+            android:name=".ui.products.AddProductActivity"
+            android:exported="false"/>
 
     </application>
 

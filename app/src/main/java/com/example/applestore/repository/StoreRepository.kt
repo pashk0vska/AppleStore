@@ -78,6 +78,12 @@ object StoreRepository {
     fun getProductsByCategory(cat: String) = products.filter { it.category == cat }
     fun addProduct(p: Product) { products.add(p) }
     fun deleteProduct(id: Int) { products.removeAll { it.id == id } }
+    fun updateProductStock(productId: Int, newStock: Int) {
+        val index = products.indexOfFirst { it.id == productId }
+        if (index != -1) {
+            products[index] = products[index].copy(stock = newStock)
+        }
+    }
     fun searchProducts(q: String) = products.filter {
         it.name.contains(q, ignoreCase = true) ||
                 it.category.contains(q, ignoreCase = true)
@@ -116,6 +122,11 @@ object StoreRepository {
             editor.putString("order_status_${order.id}", order.status.name)
         }
 
+        // Зберігаємо stock ВСІХ товарів
+        products.forEach { product ->
+            editor.putInt("product_stock_${product.id}", product.stock)
+        }
+
         // Зберігаємо нових клієнтів (від 7 і вище)
         val newClients = clients.filter { it.id >= 7 }
         editor.putInt("new_clients_count", newClients.size)
@@ -140,6 +151,20 @@ object StoreRepository {
             editor.putString("no_${index}_date", order.createdDate)
         }
 
+        // Зберігаємо нові товари (від 13 і вище)
+        val newProducts = products.filter { it.id >= 13 }
+        editor.putInt("new_products_count", newProducts.size)
+        newProducts.forEachIndexed { index, product ->
+            editor.putInt("np_${index}_id", product.id)
+            editor.putString("np_${index}_name", product.name)
+            editor.putString("np_${index}_category", product.category)
+            editor.putString("np_${index}_description", product.description)
+            editor.putFloat("np_${index}_price", product.price.toFloat())
+            editor.putFloat("np_${index}_oldPrice", product.oldPrice?.toFloat() ?: -1f)
+            editor.putInt("np_${index}_stock", product.stock)
+            editor.putString("np_${index}_imageUrl", product.imageUrl)
+        }
+
         editor.apply()
     }
 
@@ -149,6 +174,17 @@ object StoreRepository {
             val savedStatus = prefs.getString("order_status_${order.id}", null)
             if (savedStatus != null) {
                 order.status = OrderStatus.valueOf(savedStatus)
+            }
+        }
+
+        // Відновлюємо stock ВСІХ товарів
+        products.forEach { product ->
+            val savedStock = prefs.getInt("product_stock_${product.id}", -1)
+            if (savedStock != -1) {
+                val index = products.indexOfFirst { it.id == product.id }
+                if (index != -1) {
+                    products[index] = products[index].copy(stock = savedStock)
+                }
             }
         }
 
@@ -177,6 +213,22 @@ object StoreRepository {
             val status     = OrderStatus.valueOf(prefs.getString("no_${i}_status", "NEW") ?: "NEW")
             val date       = prefs.getString("no_${i}_date", "") ?: ""
             orders.add(Order(id, clientId, productId, quantity, totalPrice, status, date))
+        }
+
+        // Завантажуємо нові товари
+        val productsCount = prefs.getInt("new_products_count", 0)
+        for (i in 0 until productsCount) {
+            val id = prefs.getInt("np_${i}_id", -1)
+            if (id == -1 || products.any { it.id == id }) continue
+            val name        = prefs.getString("np_${i}_name",        "") ?: ""
+            val category    = prefs.getString("np_${i}_category",    "") ?: ""
+            val description = prefs.getString("np_${i}_description", "") ?: ""
+            val price       = prefs.getFloat("np_${i}_price",    0f).toDouble()
+            val oldPriceF   = prefs.getFloat("np_${i}_oldPrice", -1f)
+            val oldPrice    = if (oldPriceF == -1f) null else oldPriceF.toDouble()
+            val stock       = prefs.getInt("np_${i}_stock", 0)
+            val imageUrl    = prefs.getString("np_${i}_imageUrl", "") ?: ""
+            products.add(Product(id, name, category, description, price, oldPrice, stock, imageUrl))
         }
     }
 }
